@@ -10,12 +10,6 @@ CREATE TABLE alleys (
     name TEXT NOT NULL
 );
 
-INSERT INTO alleys (name)
-VALUES ('DPH'),
-('PRODUITS DU MONDE'),
-('BIO'),
-('PVP');
-
 CREATE TABLE alleys_orders (
     alley_id INT NOT NULL,
     "order" INT NOT NULL,

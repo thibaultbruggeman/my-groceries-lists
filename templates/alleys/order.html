@@ -1,0 +1,74 @@
+{% extends 'base.html' %} {% block content %}
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Ordre</th>
+      <th scope="col">Allée</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for alley in alleys %}
+    <tr>
+      <td>
+        <button
+          id="alley-{{ alley.id}}"
+          onclick="setOrder({{ alley.id }})"
+        ></button>
+      </td>
+      <td>{{ alley.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="grid">
+  <button onclick="save()">Enregistrer</button>
+</div>
+<script>
+  let currentOrderNumber = 1;
+
+  function setOrder(id) {
+    const alleyOrderElement = document.querySelector("#alley-" + id);
+
+    if (alleyOrderElement.textContent) {
+      currentOrderNumber--;
+      alleyOrderElement.textContent = "";
+      return;
+    }
+
+    alleyOrderElement.textContent = currentOrderNumber;
+
+    currentOrderNumber++;
+  }
+
+  async function save() {
+    const payload = [];
+
+    document.querySelectorAll("tbody tr").forEach((x) => {
+      const alleyOrder = x.querySelector("td button");
+
+      const id = alleyOrder.id.replace("alley-", "");
+
+      const order = alleyOrder.textContent;
+
+      if (!order) {
+        return;
+      }
+
+      payload.push({
+        alley_id: parseInt(id),
+        order: parseInt(order),
+      });
+    });
+
+    await fetch("/alleys/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    window.location = "/alleys";
+  }
+</script>
+{% endblock %}
