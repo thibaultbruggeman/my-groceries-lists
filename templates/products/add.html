@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+<form method="POST">
+  <input
+    type="text"
+    name="product"
+    placeholder="Produit"
+    aria-label="Produit"
+  />
+  <select name="alley_id" aria-label="Sélectionner une allée..." required>
+    <option selected disabled value="">Sélectionner une allée...</option>
+    {% for alley in alleys %}
+    <option value="{{ alley.id }}">{{ alley.name }}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Enregistrer" />
+</form>
+{% endblock %}

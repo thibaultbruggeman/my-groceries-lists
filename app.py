@@ -28,7 +28,7 @@ def home():
 @app.get("/alleys")
 def alleys():
     cur = get_db().cursor()
-    cur.execute('SELECT a.rowid, a.name, ao."order" FROM alleys a LEFT JOIN alleys_orders ao ON ao.alley_id = a.rowid;')
+    cur.execute('SELECT a.rowid, a.name, ao."order" FROM alleys a LEFT JOIN alleys_orders ao ON ao.alley_id = a.rowid order by ao."order" asc;')
     data = cur.fetchall()
     alleys = []
     for i in data:
@@ -78,9 +78,65 @@ def alleys_delete(id):
     cur.connection.commit()
     return "",204
 
-@app.get("/products")
+@app.get("/products") 
 def products():
-    return render_template("products.html")
+    cur = get_db().cursor()
+    cur.execute("SELECT p.rowid, p.name, a.name FROM products p LEFT JOIN alleys a ON a.rowid = p.alley_id ORDER BY p.name ASC;")
+    data = cur.fetchall()
+    products = []
+    for i in data:
+        products.append({ "id": i[0], "name": i[1], "alley": i[2] })
+
+    return render_template("products.html", products=products)
+
+@app.route("/products/add", methods=["GET", "POST"]) 
+def products_add():
+    if request.method == "POST":
+        product = request.form["product"]
+        alley_id = request.form["alley_id"]
+
+        if product is None or product == "":
+            return "", 400
+        
+        cur = get_db().cursor()
+        cur.execute("INSERT INTO products (name, alley_id) VALUES (?, ?)", (product.upper(), alley_id,))
+        cur.connection.commit()
+
+        return redirect(url_for('products'))
+    
+    cur = get_db().cursor()
+    cur.execute("SELECT rowid, name FROM alleys order by name asc;")
+    data = cur.fetchall()
+    alleys = []
+    for i in data:
+            alleys.append({ "id": i[0], "name": i[1] })
+    
+    return render_template("products/add.html", alleys=alleys)
+
+@app.route("/products/<int:id>", methods=["GET", "POST"]) 
+def products_edit():
+    if request.method == "POST":
+        product = request.form["product"]
+        alley_id = request.form["alley_id"]
+
+        if product is None or product == "":
+            
+            return "", 400
+        
+        cur = get_db().cursor()
+        cur.execute("INSERT INTO products (name, alley_id) VALUES (?, ?)", (product.upper(), alley_id,))
+        cur.connection.commit()
+
+        return redirect(url_for('products'))
+    
+    cur = get_db().cursor()
+    cur.execute("SELECT rowid, name FROM alleys order by name asc;")
+    data = cur.fetchall()
+    alleys = []
+    for i in data:
+            alleys.append({ "id": i[0], "name": i[1] })
+    
+    return render_template("products/add.html", alleys=alleys)
 
 if __name__ == '__main__':
     app.run(debug=True)
