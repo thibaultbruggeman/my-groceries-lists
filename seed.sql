@@ -12,16 +12,12 @@ CREATE TABLE alleys (
 
 CREATE TABLE alleys_orders (
     alley_id INT NOT NULL,
-    "order" INT NOT NULL,
-    CONSTRAINT fk_alleys_orders_alley_id FOREIGN KEY (alley_id)
-    REFERENCES alleys(id)
+    "order" INT NOT NULL
 );
 
-CREATE TABLE items (
+CREATE TABLE products (
     name TEXT NOT NULL,
-    alley_id INT NULL,
-    CONSTRAINT fk_items_alley_id FOREIGN KEY (alley_id)
-    REFERENCES alleys(id)
+    alley_id INT NULL
 );
 
 CREATE TABLE lists (
@@ -29,11 +25,7 @@ CREATE TABLE lists (
     archived BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE lists_items (
+CREATE TABLE lists_products (
     list_id INT NOT NULL,
-    item_id INT NOT NULL,
-    CONSTRAINT fk_lists_items_list_id FOREIGN KEY (list_id)
-    REFERENCES lists(id),
-    CONSTRAINT fk_lists_items_item_id FOREIGN KEY (item_id)
-    REFERENCES items(id)
+    products_id INT NOT NULL
 );
