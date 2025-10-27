@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% block content %}
+<article data-list-id="{{ list.id }}">
+  <header>Liste du {{ list.date }}</header>
+  <input
+    type="search"
+    placeholder="Rechercher un produit..."
+    aria-label="Search"
+    oninput="handleSearch(event)"
+  />
+  <footer style="display: none">
+    <table class="striped">
+      <tbody></tbody>
+    </table>
+  </footer>
+</article>
+<article>
+  {% for product in products %}
+  <p>{{ product.name }}</p>
+  {% endfor%}
+</article>
+<script>
+  function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
+  async function search(event) {
+    const query = event.target.value;
+
+    const footer = document.querySelector("footer");
+    const tbody = document.querySelector("tbody");
+
+    tbody.innerHTML = "";
+
+    if (!query) {
+      footer.style.display = "none";
+      return;
+    }
+
+    const res = await fetch("/products/search?q=" + query);
+
+    const result = await res.json();
+
+    if (result.length === 0) {
+      tbody.insertAdjacentHTML("beforeend", "<tr><td>Aucun résultat.</td><tr>");
+      footer.style.display = "block";
+      return;
+    }
+
+    result.forEach((x) => {
+      tbody.insertAdjacentHTML(
+        "beforeend",
+        `
+                <tr>
+                    <td>${x.name}</td>
+                    <td><button onclick="addProductToList(${x.id})">Ajouter</button></td>
+                </tr>`
+      );
+    });
+
+    footer.style.display = "block";
+  }
+
+  const handleSearch = debounce(search, 300);
+
+  async function addProductToList(id) {
+    const listId = document.querySelector("article").dataset.listId;
+
+    await fetch("/lists/add-product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ list_id: listId, products_id: id }),
+    });
+
+    location.reload();
+  }
+</script>
+{% endblock %}

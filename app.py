@@ -23,7 +23,13 @@ def close_connection(exception):
 # Views
 @app.get("/")
 def home():
-    return render_template("index.html")
+    cur = get_db().cursor()
+    cur.execute('SELECT rowid, "date" FROM lists WHERE archived = FALSE ORDER BY "date" DESC;')
+    data = cur.fetchall()
+    lists = []
+    for i in data:
+            lists.append({ "id": i[0], "date": i[1] })
+    return render_template("index.html", lists=lists)
 
 @app.get("/alleys")
 def alleys():
@@ -138,5 +144,56 @@ def products_edit():
     
     return render_template("products/add.html", alleys=alleys)
 
+@app.route("/lists/add", methods=["GET", "POST"])
+def lists_add():
+    if request.method == "POST":
+        date = request.form["date"]
+        cur = get_db().cursor()
+        cur.execute('INSERT INTO lists ("date") VALUES (?)', (date,))
+        cur.connection.commit()
+        return redirect(url_for("lists_edit", id=cur.lastrowid))
+    
+    return render_template("lists/add.html")
+
+@app.get("/lists/<int:id>")
+def lists_edit(id):
+    cur = get_db().cursor()
+    cur.execute('SELECT rowid, "date" FROM lists WHERE rowid = ?;', (id,))
+    data = cur.fetchone()
+    if data is None:
+        return "", 404 
+    
+    list = { "id": data[0], "date": data[1] }
+
+    cur = get_db().cursor()
+    cur.execute('select distinct p.name from products p join lists_products lp on lp.products_id = p.rowid where lp.list_id = ? order by p.name;', (id,))
+    data = cur.fetchall()
+    products = []
+    for i in data:
+        products.append({ "name": i[0] })
+
+    return render_template("lists/edit.html", list=list, products=products)
+
+@app.get("/products/search")
+def products_search():
+    query = request.args.get('q')
+    cur = get_db().cursor()
+    cur.execute("SELECT rowid, name FROM products where name LIKE ? order by name asc LIMIT 10;", (query + "%",))
+    data = cur.fetchall()
+    result = []
+    for i in data:
+       result.append({ "id": i[0], "name": i[1] })
+    return jsonify(result)
+
+@app.post("/lists/add-product")
+def lists_add_product():
+    body = request.get_json()
+    cur = get_db().cursor()
+    cur.execute('INSERT INTO lists_products (list_id, products_id) VALUES (?, ?)', (body["list_id"],body["products_id"],))
+    cur.connection.commit()
+    return "", 201
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+    
