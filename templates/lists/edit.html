@@ -18,9 +18,21 @@
 </article>
 <article>
   {% for product in products %}
-  <p>{{ product.name }}</p>
+  <div onclick="openDialog({{ product }})">{{ product.name }}</div>
+  <hr />
   {% endfor%}
 </article>
+<dialog id="productDialog">
+  <article>
+    <p></p>
+    <footer>
+      <button class="secondary" onclick="closeDialog()">
+        Annuler
+      </button>
+      <button onclick="deleteProduct()">Valider</button>
+    </footer>
+  </article>
+</dialog>
 <script>
   function debounce(func, delay) {
     let timeout;
@@ -83,6 +95,30 @@
     });
 
     location.reload();
+  }
+
+  let currentProduct
+  function openDialog(product) {
+    currentProduct = product
+    const dialog = document.querySelector("#productDialog")
+
+    dialog.querySelector("article p").textContent = `Supprimer ${currentProduct.name} de la liste ?`
+    dialog.setAttribute("open", null)
+  }
+
+  function closeDialog() {
+    const dialog = document.querySelector("#productDialog")
+    dialog.querySelector("article p").textContent = ''
+    dialog.removeAttribute("open")
+    currentProduct = null
+  }
+
+  async function deleteProduct() {
+    const listId = document.querySelector("article").dataset.listId;
+
+    await fetch(`/lists/${listId}/delete-product/${currentProduct.id}`, { method: "DELETE" })
+
+    location.reload()
   }
 </script>
 {% endblock %}

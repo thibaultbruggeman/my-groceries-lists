@@ -166,11 +166,11 @@ def lists_edit(id):
     list = { "id": data[0], "date": data[1] }
 
     cur = get_db().cursor()
-    cur.execute('select distinct p.name from products p join lists_products lp on lp.products_id = p.rowid where lp.list_id = ? order by p.name;', (id,))
+    cur.execute('select p.name, p.rowid from products p join lists_products lp on lp.products_id = p.rowid where lp.list_id = ? order by p.name;', (id,))
     data = cur.fetchall()
     products = []
     for i in data:
-        products.append({ "name": i[0] })
+        products.append({ "name": i[0], "id": i[1] })
 
     return render_template("lists/edit.html", list=list, products=products)
 
@@ -192,6 +192,13 @@ def lists_add_product():
     cur.execute('INSERT INTO lists_products (list_id, products_id) VALUES (?, ?)', (body["list_id"],body["products_id"],))
     cur.connection.commit()
     return "", 201
+
+@app.delete("/lists/<int:list_id>/delete-product/<int:product_id>")
+def lists_delete_product(list_id, product_id):
+    cur = get_db().cursor()
+    cur.execute('DELETE FROM lists_products WHERE list_id = ? and products_id = ?', (list_id,product_id,))
+    cur.connection.commit()
+    return "", 204
 
 @app.get("/lists/start/<int:id>")
 def lists_start(id):
