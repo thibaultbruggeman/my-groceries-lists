@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .line-through {
+        text-decoration: line-through;
+    }
+</style>
+{% for alley in list %}
+<article>
+    <header>
+        {{ alley }}
+    </header>
+    {% for product in list[alley] %}
+    <div onclick="toggleLineThrough(event)">{{ product }}</div>
+    <hr />
+    {% endfor %}
+</article>
+{% endfor %}
+<script>
+    function toggleLineThrough(event) {
+        event.target.classList.toggle("line-through")
+    }
+</script>
+{% endblock %}

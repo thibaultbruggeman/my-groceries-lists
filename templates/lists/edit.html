@@ -1,6 +1,9 @@
 {% extends 'base.html' %} {% block content %}
 <article data-list-id="{{ list.id }}">
-  <header>Liste du {{ list.date }}</header>
+  <header style="display:flex;justify-content:space-between;align-items: center;">
+    Liste du {{ list.date }} 
+    <button class="outline" onclick="window.location = '/lists/start/{{ list.id }}'">Démarrer</button>
+  </header>
   <input
     type="search"
     placeholder="Rechercher un produit..."

@@ -193,6 +193,30 @@ def lists_add_product():
     cur.connection.commit()
     return "", 201
 
+@app.get("/lists/start/<int:id>")
+def lists_start(id):
+    cur = get_db().cursor()
+    cur.execute("""select a.name, p.name
+from lists_products lp 
+join products p ON p.rowid = lp.products_id 
+join alleys a ON a.rowid = p.alley_id 
+join alleys_orders ao ON ao.alley_id = a.rowid
+where lp.list_id = 1
+order by ao."order";""")
+    data = cur.fetchall()
+    
+    list = {}
+    for i in data:
+        val = list.get(i[0])
+
+        if val is None:
+            list[i[0]] = []
+            list[i[0]].append(i[1])
+            continue 
+
+        val.append(i[1])
+    return render_template("lists/start.html", list=list)
+
 if __name__ == '__main__':
     app.run(debug=True)
 
