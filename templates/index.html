@@ -1,10 +1,12 @@
 {% extends 'base.html' %}{% block content %}
-<div class="grid">
-    <button class="outline" onclick="window.location = '/lists/add'">Nouvelle Liste</button>
-</div>
 {% for list in lists %}
 <article style="text-align: center;" onclick="window.location = '/lists/{{ list.id }}'">
 {{ list.date }}
+</article>
+<article>
+    <div class="grid">
+        <button class="outline" onclick="window.location = '/lists/add'">Nouvelle Liste</button>
+    </div>
 </article>
 {% endfor %}
 {% endblock %}

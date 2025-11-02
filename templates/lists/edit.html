@@ -1,11 +1,13 @@
 {% extends 'base.html' %} {% block content %}
-<article data-list-id="{{ list.id }}">
+<article>
+  <div class="grid">
+    <button class="outline" onclick="window.location = '/lists/start/{{ list.id }}'">Démarrer</button>
+    <button class="secondary" onclick="handleArchiveList({{ list.id }})">Archiver</button>
+  </div>
+</article>
+<article id="list" data-list-id="{{ list.id }}">
   <header style="display:flex;justify-content:space-between;align-items: center;">
     Liste du {{ list.date }} 
-    <div>
-      <button class="outline" onclick="window.location = '/lists/start/{{ list.id }}'">Démarrer</button>
-      <button class="secondary" onclick="handleArchiveList({{ list.id }})">Archiver</button>
-    </div>
   </header>
   <input
     type="search"
@@ -87,7 +89,7 @@
   const handleSearch = debounce(search, 300);
 
   async function addProductToList(id) {
-    const listId = document.querySelector("article").dataset.listId;
+    const listId = document.querySelector("#list").dataset.listId;
 
     await fetch("/lists/add-product", {
       method: "POST",
