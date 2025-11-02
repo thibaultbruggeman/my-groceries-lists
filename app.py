@@ -1,7 +1,11 @@
 import sqlite3
+import calendar
+import locale
 
 from flask import Flask, render_template, g, jsonify, request, redirect, url_for
 from flask_cors import CORS
+
+locale.setlocale(locale.LC_ALL, "fr_FR")
 
 DATABASE = 'groceries.db'
 
@@ -243,6 +247,45 @@ def lists_archive(id):
     cur = get_db().cursor()
     cur.execute('UPDATE lists SET archived = TRUE where rowid = ?', (id,))
     cur.connection.commit()
+    return "", 204
+
+@app.get("/meals")
+def meals():
+    cur = get_db().cursor()
+    cur.execute("select day, day_part, meal from meals;")
+    data = cur.fetchall()
+
+    week_days = list(calendar.day_name)
+    meals = {}
+    current_day = ""
+    tmp = {}
+    for i in data:
+        day = week_days[i[0]]
+  
+        if current_day == day:
+            meals[day] = tmp | { i[1]: "" if i[2] is None else i[2] } 
+            continue
+
+        tmp = { i[1]: i[2] } 
+        current_day = day
+
+    for day, meal in meals.items():
+        print(day, meal)
+
+    return render_template("meals.html", meals=meals)
+
+@app.put("/meals/edit")
+def meals_edit():
+    week_days = list(calendar.day_name)
+    body = request.get_json()
+    day_idx = week_days.index(body["day"])
+    day_part = body["dayPart"]
+    meal = body["meal"]
+
+    cur = get_db().cursor()
+    cur.execute('UPDATE meals SET meal = ? where day = ? AND day_part = ?;', (meal, day_idx, day_part,))
+    cur.connection.commit()
+
     return "", 204
 
 if __name__ == '__main__':

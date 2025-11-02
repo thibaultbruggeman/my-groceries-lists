@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for day, meal in meals.items() %}
+<article data-day="{{ day }}">
+    <details open>
+        <summary>{{ day }}</summary>
+        <details >
+            <summary>MIDI</summary>
+            <div class="grid">
+                <input type="text" value="{{ meal['LUNCH'] }}" name="LUNCH">
+                <button>
+                    Enregistrer
+                </button>
+            </div>
+        </details>
+        <details open>
+            <summary>SOIR</summary>
+            <div class="grid">
+                <input type="text" value="{{ meal['DINNER'] }}" name="DINNER" >
+                <button>
+                    Enregistrer
+                </button>
+            </div>
+        </details>
+    </details>
+</article>
+{% endfor %}
+<script>
+    document.querySelectorAll("button").forEach(x => x.addEventListener("click", async (e) => {
+        const payload = { 
+            day: e.target.closest("article").dataset.day, 
+            dayPart: e.target.previousElementSibling.name,
+            meal: e.target.previousElementSibling.value
+        }
+
+        await fetch("/meals/edit", { 
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            }, 
+            body: JSON.stringify(payload) 
+        })
+    }))
+</script>
+{% endblock %}
