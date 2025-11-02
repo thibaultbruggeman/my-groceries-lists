@@ -2,7 +2,10 @@
 <article data-list-id="{{ list.id }}">
   <header style="display:flex;justify-content:space-between;align-items: center;">
     Liste du {{ list.date }} 
-    <button class="outline" onclick="window.location = '/lists/start/{{ list.id }}'">Démarrer</button>
+    <div>
+      <button class="outline" onclick="window.location = '/lists/start/{{ list.id }}'">Démarrer</button>
+      <button class="secondary" onclick="handleArchiveList({{ list.id }})">Archiver</button>
+    </div>
   </header>
   <input
     type="search"
@@ -119,6 +122,18 @@
     await fetch(`/lists/${listId}/delete-product/${currentProduct.id}`, { method: "DELETE" })
 
     location.reload()
+  }
+
+  async function handleArchiveList(id) {
+    const ok = confirm("Êtes-vous sur d'archiver la liste ?")
+
+    if (!ok) {
+      return
+    }
+
+    await fetch('/lists/archive/' + id, { method: "PUT" })
+
+    window.location = '/'
   }
 </script>
 {% endblock %}

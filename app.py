@@ -222,8 +222,8 @@ from lists_products lp
 join products p ON p.rowid = lp.products_id 
 join alleys a ON a.rowid = p.alley_id 
 join alleys_orders ao ON ao.alley_id = a.rowid
-where lp.list_id = 1
-order by ao."order";""")
+where lp.list_id = ?
+order by ao."order";""", (id,))
     data = cur.fetchall()
     
     list = {}
@@ -237,6 +237,13 @@ order by ao."order";""")
 
         val.append(i[1])
     return render_template("lists/start.html", list=list)
+
+@app.put("/lists/archive/<int:id>")
+def lists_archive(id):
+    cur = get_db().cursor()
+    cur.execute('UPDATE lists SET archived = TRUE where rowid = ?', (id,))
+    cur.connection.commit()
+    return "", 204
 
 if __name__ == '__main__':
     app.run(debug=True)
