@@ -2,6 +2,7 @@
 <form method="POST">
     <input type="hidden" value="{{ product.id }}" name="product_id"/>
   <input
+    data-alley-id="{{ product.alley_id }}"
     type="text"
     name="product"
     placeholder="Produit"
@@ -16,4 +17,24 @@
   </select>
   <input type="submit" value="Enregistrer" />
 </form>
+<div class="grid">
+  <button onclick="history.go(-1)">Annuler</button>
+</div>
+<script>
+  const productAlleyId = document.querySelector('input[name="product"]').dataset.alleyId
+  const alleys = document.querySelectorAll("select option")
+
+  alleys.forEach(x => {
+    if (x.getAttribute("selected") === ''){
+      x.setAttribute("selected", null)
+      return
+    }
+
+    if (productAlleyId !== x.value) {
+      return
+    }
+
+    x.setAttribute("selected", "")
+  })
+</script>
 {% endblock %}

@@ -145,9 +145,9 @@ def products_edit(id):
         return redirect(url_for('products'))
     
     cur = get_db().cursor()
-    cur.execute("SELECT rowid, name FROM products where rowid = ?;", (id,))
+    cur.execute("SELECT rowid, name, alley_id FROM products where rowid = ?;", (id,))
     data = cur.fetchone()
-    product = { "id": data[0], "name": data[1] }
+    product = { "id": data[0], "name": data[1], "alley_id": data[2] }
     
     cur = get_db().cursor()
     cur.execute("SELECT rowid, name FROM alleys order by name asc;")
