@@ -15,3 +15,9 @@ Then in the sqlite3 console:
 ```bash
 .read seed.sql
 ```
+
+## Install packages
+
+```bash
+pip install -r requirements.txt
+```
