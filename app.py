@@ -3,14 +3,12 @@ import calendar
 import locale
 
 from flask import Flask, render_template, g, jsonify, request, redirect, url_for
-from flask_cors import CORS
 
 locale.setlocale(locale.LC_ALL, "fr_FR")
 
 DATABASE = 'groceries.db'
 
 app = Flask(__name__)
-CORS(app)
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -225,7 +223,7 @@ def lists_start(id):
 from lists_products lp 
 join products p ON p.rowid = lp.products_id 
 join alleys a ON a.rowid = p.alley_id 
-join alleys_orders ao ON ao.alley_id = a.rowid
+left join alleys_orders ao ON ao.alley_id = a.rowid
 where lp.list_id = ?
 order by ao."order";""", (id,))
     data = cur.fetchall()
