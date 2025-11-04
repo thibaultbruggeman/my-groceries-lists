@@ -31,4 +31,11 @@
     {% endfor %}
   </tbody>
 </table>
+<script>
+  async function deleteAlley(id) {
+    await fetch("/alleys/delete/" + id, { method: "DELETE" })
+
+    location.reload()
+  }
+</script>
 {% endblock %}

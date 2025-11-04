@@ -3,10 +3,10 @@
 <article style="text-align: center;" onclick="window.location = '/lists/{{ list.id }}'">
 {{ list.date }}
 </article>
+{% endfor %}
 <article>
     <div class="grid">
         <button class="outline" onclick="window.location = '/lists/add'">Nouvelle Liste</button>
     </div>
 </article>
-{% endfor %}
 {% endblock %}

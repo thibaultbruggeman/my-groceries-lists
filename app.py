@@ -89,6 +89,10 @@ def alleys_delete(id):
     cur = get_db().cursor()
     cur.execute("DELETE FROM alleys WHERE rowid = ?", (id,))
     cur.connection.commit()
+    cur.execute("DELETE FROM alleys_orders WHERE alley_id = ?", (id,))
+    cur.connection.commit()
+    cur.execute("UPDATE products set alley_id = NULL WHERE alley_id = ?", (id,))
+    cur.connection.commit()
     return "",204
 
 @app.get("/products")
@@ -101,7 +105,7 @@ def products():
     data = cur.fetchall()
     products = []
     for i in data:
-        products.append({ "id": i[0], "name": i[1], "alley": i[2] })
+        products.append({ "id": i[0], "name": i[1], "alley": "" if i[2] is None else i[2] })
 
     return render_template("products.html", products=products)
 
